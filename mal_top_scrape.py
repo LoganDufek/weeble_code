@@ -6,7 +6,7 @@ import xlwt
 from xlwt import Workbook
 
 
-url = "https://myanimelist.net/topanime.php?limit=1050"
+url = "https://myanimelist.net/topanime.php?limit=1450"
 result = requests.get(url)
 doc = BeautifulSoup(result.text, "html.parser")
 

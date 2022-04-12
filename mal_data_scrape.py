@@ -6,12 +6,15 @@ import xlwt
 from xlwt import Workbook
 
 
-url = "https://myanimelist.net/anime/43608/Kaguya-sama_wa_Kokurasetai__Ultra_Romantic"
+url = "https://myanimelist.net/anime/39486/Gintama__The_Final"
 result = requests.get(url)
 doc = BeautifulSoup(result.text, "html.parser")
 
-score = doc.find_all(class_="score-label")
-print(score[0].num)
+# score = doc.find(itemprop="lazyloaded")
+# array = score
+# images = doc.findAll('img')[1]
+# print(images.parent.text)
+
 
 wb = Workbook()
 sheet1 = wb.add_sheet('Weeble Data')
@@ -1026,15 +1029,39 @@ for x in range(10):
     anime_name = doc3.find_all("h1")
     anime_name_english = doc3.find_all("p")
     score = doc3.find_all(class_="score-label")
+    typeO = doc3.find(class_="dark_text", string="Type:" )
+    studio = doc3.find(class_="dark_text", string="Studios:" )
+    source = doc3.find(class_="dark_text", string="Source:" )
+    episodes = doc3.find(class_="dark_text", string="Episodes:" )
+    type_array = typeO.parent.text.split()
+    episodes_array = episodes.next_sibling.split()
     
     if len(anime_name_english[0].text) > 65:
         anime_name_english = "N/A"
         sheet1.write(x, 1, anime_name[0].text)
         sheet1.write(x, 2, anime_name_english)
-        sheet1.write(x, 3, score[0].text )
+        sheet1.write(x, 3, score[0].text)
+        sheet1.write(x, 4, studio.parent.text)
+        sheet1.write(x, 5, source.next_sibling)
+        sheet1.write(x, 8, int(episodes_array[0]))
     else:
         sheet1.write(x, 1, anime_name[0].text)
         sheet1.write(x, 2, anime_name_english[0].text)
-        sheet1.write(x, 3, score[0].text )
+        sheet1.write(x, 3, score[0].text)
+        sheet1.write(x, 4, studio.parent.text)
+        sheet1.write(x, 5, source.next_sibling)
+        sheet1.write(x, 8, int(episodes_array[0]))
     
-    wb.save('xlwt example.xls')
+    if type_array[1] == "TV":
+        premiere = doc3.find(class_="dark_text", string="Premiered:" )
+        premiere_array = premiere.parent.text.split()
+        sheet1.write(x, 6, premiere_array[1])
+        sheet1.write(x, 7, int(premiere_array[2]))
+    else:
+        aired = doc3.find(class_="dark_text", string="Aired:" )
+        aired_array = aired.next_sibling.split()
+        sheet1.write(x, 6, "N/A")
+        sheet1.write(x, 7, int(aired_array[2]))
+    
+    
+    wb.save('weeble_data.xls')
